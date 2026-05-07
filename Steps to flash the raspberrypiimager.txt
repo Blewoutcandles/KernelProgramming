@@ -1,0 +1,7 @@
+1.Downlaod the balena etcher software
+2.Download the os (raspberry pi imager lite 64 bit)
+3.Run cmd as administrator and run the commands: 
+i. diskpart
+ii.select disk 1
+iii.clean
+4. open etcher choose os and flash yahoo ready to go!!
