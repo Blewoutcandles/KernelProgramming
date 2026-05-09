@@ -1,0 +1,27 @@
+/*THIS IS THE REGISTRATION OF THE ABOVE ENTRY POINTS TO THE KERNEL*/
+module_init(my_k_module_begin);
+module_exit(my_k_module_exit);
+
+Macros : 
+module_init and module_exit used to register modules init and exit function with the kernel.
+Defined in linux/module.h.
+module_init -> adds it's parameter to the init entry point database of the kernel.
+module_exit -> adds it's parameter to the exit entry point database of the kernel.
+
+MODULE_LICENSE("GPL"); //adhers to gpl licensing
+MODULE_AUTHOR("marzjukm7@gmail.com");
+MODULE_DESCRIPTION("THIS IS MY FIRST KERNEL MODULE");
+
+MODULE_LICENSE : used by kernel module to announce it's license type.
+* If trying to load a module that is non-GPL (General Public license), then kernel triggers a warning of being tainted,
+way of telling the developers and users to know it is non-free license based module.
+* The developer community may ignore the bug reports you submit after loading the proprietary licensed module.
+* This declared license also used to decide whether a module can have access to small no of GPL only symbols in
+the kernel. 
+* See linux/module.h to find what allowed parameters which can be used with this macro to load the module without tainting
+the kernel
+
+MODULE_INFO(name, "string_value") 
+eg : MODULE_INFO(board, "BeagleBone");
+How to view the module info from a module with .ko extension: 
+arm-linux-gnueabihf-objdump -d -j .modinfo helloworld.ko

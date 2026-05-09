@@ -1,0 +1,34 @@
+Kernel build ways:
+1. Statically link against the kernel image
+2. Dynamically loadable
+
+Dynamically loadable:
+2 types:
+1. In tree module: (internal to the linux source tree)
+2. Out tree module: (external to the linux source tree) - This method taints the kernel, issues a warning saying
+out of the tree module has been loaded, we can safely ignore this.
+
+Building a kernel module  (out of tree):
+kbuild- the build system used by the linux kernel. 
+*Must use this system to stay compatible with changes in the build 
+*infrastructure and to pick up the right flags to GCC.
+*Must have a prebuilt kernel source that contains the configurations and header files used in the build
+*Thus ensuring if the developer make some changes to the kernel configuration, our custom driver will rebuilt with the 
+correct kernel configuration.
+*Why prebuilt kernel source required?   Modules are linked against the  object files it found in the kernel, 
+we cannot compile against one linux version and load into the system which runs different kernel version even loading 
+is successfull there might be symbol lookup error. Keep a kernel source in your system and build kernel against it.
+
+Two ways to obtain the prebuilt kernel version:
+1. Download linux kernel from distributor and built by yourself 
+2. Install the Linux-headers of the target linux kernel
+
+cmd to build external modules:
+make -C <path to linux kernel tree> M=<path to your module> [target]
+
+Kbuild rules (used by top level makefile):
+* Compiler switches
+* Dependency list
+* Version string
+
+Linux Source tree: Top level make file ---> Local MakeFile : our working directory where external modules are built.

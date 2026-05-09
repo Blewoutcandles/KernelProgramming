@@ -1,0 +1,32 @@
+/*Note:
+* Marked static and __init - so neither other modules call this module entry point nor it provides any support or 
+* services to other modules, for static modules: 
+* function exit point will not get called since we cannot remove a statically linked module even the kernel ignores 
+* the function that has __exit marker when during build process hence it makes sense to make this function static 
+* though it is optional but dynamic modules can be inserted or removed during runtime as per user commands
+* __exit: This is an entry point to modules removal. Clean up function will get called only in case of dynamic modules
+* and removed using rmmod commands
+* Kernel header files location: 
+* linux_source/include/linux
+* FN MACROS:
+* __init, __exit
+* How these are defined in the files:
+* #define __init        __section(.init.text)  -->compiler directive which directs the compiler to keep data or code in
+*                                                   an output section called ".init"
+* #define __initdata    __section(.init.data)
+* #define __initconst   __section(.init.rodata)
+* #define __exit        __section(.exit.text) --> compiler directive which directs the compiler to keep data or code in
+*                                                   an output section called ".exit"
+* defined in linux_src/include/linux/init.h
+*/
+
+/*
+*__init and __exit:  These functions make sense only for dynamic modules. For static modules, once it is initialized,
+there is no longer a need to remove it, so the __exit function is not called. The code memory for the __init function is 
+freed after its execution. Time of clearance: During boot time by the kernel only after __init function has executed
+* Since the built in driver cannot be unloaded , it's init function will not be called until the next reboot.
+* Similarly we can use __initdata to drop the memory of the variables after it has been initialized.
+
+*__exit: Built in modules does not need __exit cleanup functions since it never gets unloaded, the kernel build system 
+it self will remove it from the build process - will not be the part of the final kernel image,
+functions without the __exit and __init entry markers will be placed in the .text section*/
