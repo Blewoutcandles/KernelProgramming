@@ -17,7 +17,7 @@ kbuild- the build system used by the linux kernel.
 correct kernel configuration.
 *Why prebuilt kernel source required?   Modules are linked against the  object files it found in the kernel, 
 we cannot compile against one linux version and load into the system which runs different kernel version even loading 
-is successfull there might be symbol lookup error. Keep a kernel source in your system and build kernel against it.
+is successful there might be symbol lookup error. Keep a kernel source in your system and build kernel against it.
 
 Two ways to obtain the prebuilt kernel version:
 1. Download linux kernel from distributor and built by yourself 
@@ -26,9 +26,60 @@ Two ways to obtain the prebuilt kernel version:
 cmd to build external modules:
 make -C <path to linux kernel tree> M=<path to your module> [target]
 
+syntax explanation: 
+make -> command that trigger the top level make file and redirects to the local makefile
+-C compiler switch to trigger the top level makefile
+M  to redirect the build flow to the local makefile
+
+Linux Source tree: Top level make file ---> Local MakeFile : our working directory where external modules are built.
+
+General syntax: make -C $KDIR M=$PWD [Targets]
+-C $KDIR -> The directory where the kernel source is located. Make initially points to this specific directory and will 
+change back when finished executing.
+M=$PWD -> Informs the kbuild that an external module is being built. Value to M is the absolute path of the directory 
+where the external module (kbuild file) is located.
+[Targest] :
+1. modules -> Default target for external modules. Same functionality as if no target was specified.
+2. modules_install -> Install the external modules. The default location is /lib/modules/<kernel_release>/extra/, but a
+prefix may be added with INSTALL_MOD_PATH
+3. clean -> Remove all the generated files in the module directory only.
+4. help -> List the available targets for external modules.
+
 Kbuild rules (used by top level makefile):
 * Compiler switches
 * Dependency list
 * Version string
 
-Linux Source tree: Top level make file ---> Local MakeFile : our working directory where external modules are built.
+Build can be done on both host machine and target machine.
+
+Build process for helloworld module against host:
+1. Build against host machine, Check the host using : 
+i. uname -r
+eg:
+takeoff@takeoff-ASUS-TUF-Gaming-F15-FX506LH-FX566LH:~/code/MyModules$ uname -r
+6.8.0-111-generic
+
+ii. Host libraries will be in '/lib/modules/6.8.0-111-generic/', give the make command as follows:
+make -C /lib/modules/6.8.0-111-generic/build/ M=$PWD modules
+
+
+iii. To insert the kernel module into our host running kernel. 
+sudo insmod  001Helloworld.ko
+
+To view the result run 
+dmesg 
+op: [ 5005.078431] Hello World
+
+To remove the module:
+sudo rmmod 001Helloworld.ko
+dmesg
+op: [ 5162.543026] Good bye world
+
+iv. To clean the build files:
+make -C /lib/modules/6.8.0-111-generic/build/ M=$PWD clean
+or
+make -C /lib/modules/$(uname -r)/build/ M=$PWD clean
+
+Build process for helloworld module against target device:
+Modification to above step ii, make command
+make ARCH=arm CROSS_COMPILE=arm-linux-gnueabihf- -C /home/takeoff/code/Rspi_linux/kernel/ M=$PWD modules
