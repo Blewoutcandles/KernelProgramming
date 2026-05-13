@@ -1,0 +1,11 @@
+step1 : securely copy the .ko module from pc to target device (raspberry pi)
+scp 001Helloworld.ko raspberrypi@ip_address:/destination_path
+
+step2: Go to the directory and run 
+sudo insmod 001Heloworld.ko
+
+step3: view using dmesg
+sudo dmesg | tail
+
+step4: Remove the module and check using dmesg
+sudo rmmod 001Helloworld.ko 

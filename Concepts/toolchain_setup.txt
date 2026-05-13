@@ -1,0 +1,44 @@
+Check your system : uname -a
+
+takeoff@takeoff-ASUS-TUF-Gaming-F15-FX506LH-FX566LH:~/code/Rspi_linux$ uname -a
+Linux takeoff-ASUS-TUF-Gaming-F15-FX506LH-FX566LH 6.8.0-111-generic 
+#111~22.04.1-Ubuntu SMP PREEMPT_DYNAMIC Tue Apr 14 17:13:45 UTC  x86_64 x86_64 x86_64 GNU/Linux
+
+These below steps for gcc version < 8.0.0, your system might already have latest version, see next heading
+Go to this site : 
+https://releases.linaro.org/components/toolchain/binaries/7.5-2019.12/aarch64-linux-gnu/
+
+Download:
+gcc-linaro-7.5.0-2019.12-x86_64_aarch64-linux-gnu.tar.xz
+
+Extract using : tar -xvf gcc-linaro-7.5.0-2019.12-x86_64_aarch64-linux-gnu.tar.tar
+
+Export the path: 
+export PATH=/home/takeoff/code/gcc-linaro-7.5.0-2019.12-x86_64_aarch64-linux-gnu/bin:$PATH
+
+takeoff@takeoff-ASUS-TUF-Gaming-F15-FX506LH-FX566LH:~/code/Rspi_linux$ export PATH=/home/takeoff/code/gcc-linaro-7.5.0-2019.12-x86_64_aarch64-linux-gnu/bin:$PATH
+takeoff@takeoff-ASUS-TUF-Gaming-F15-FX506LH-FX566LH:~/code/Rspi_linux$ which aarch64-linux-gnu-gcc
+/home/takeoff/code/gcc-linaro-7.5.0-2019.12-x86_64_aarch64-linux-gnu/bin/aarch64-linux-gnu-gcc
+
+NOTE: The export command needs to done everytime you are proceeding to cross compile.
+
+To export it permanently add the export command to bashrc file.
+echo 'export PATH=/home/takeoff/code/gcc-linaro-7.5.0-2019.12-x86_64_aarch64-linux-gnu/bin:$PATH' >> ~/.bashrc
+eg:
+takeoff@takeoff-ASUS-TUF-Gaming-F15-FX506LH-FX566LH:~/code/Rspi_linux$ echo 'export PATH=/home/takeoff/code/\
+gcc-linaro-7.5.0-2019.12-x86_64_aarch64-linux-gnu/bin:$PATH' >> ~/.bashrc
+
+
+Latest aarch64-linux-gnu-gcc version:
+
+takeoff@takeoff-ASUS-TUF-Gaming-F15-FX506LH-FX566LH:~/code/Rspi_linux$ which aarch64-linux-gnu-gcc
+/usr/bin/aarch64-linux-gnu-gcc
+
+takeoff@takeoff-ASUS-TUF-Gaming-F15-FX506LH-FX566LH:~/code/Rspi_linux$ export PATH=/usr/bin:$PATH
+takeoff@takeoff-ASUS-TUF-Gaming-F15-FX506LH-FX566LH:~/code/Rspi_linux$ echo 'export PATH=/usr/bin:$PATH' >> ~/.bashrc
+
+To check:
+takeoff@takeoff-ASUS-TUF-Gaming-F15-FX506LH-FX566LH:~/code/Rspi_linux$ vi ~/.bashrc 
+
+If still the cross_compiler you provide is not found, then navigate to '/etc/sudoers', under secure path add 
+"export PATH=/usr/bin:$PATH" with a colon ':' at front. eg: :export PATH=/usr/bin:$PATH

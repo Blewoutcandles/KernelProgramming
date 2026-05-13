@@ -1,0 +1,39 @@
+The Raspberry Pi 4 uses a 64-bit ARM Cortex-A72 processor based on the ARMv8-A architecture. 
+This quad-core processor (within the Broadcom BCM2711 SoC) runs at 1.5 GHz or 1.8 GHz,
+The below steps needs to be performed after toolchain setup.
+
+step1 : Remove all the temporary folders, object files, .ko files created from the previous builds and clears the 
+.config file if it was created before.
+
+takeoff@takeoff-ASUS-TUF-Gaming-F15-FX506LH-FX566LH:~/code/Rspi_linux$ make ARCH=arm64 distclean
+  CLEAN   scripts/basic
+  CLEAN   scripts/kconfig
+
+step2 : Create a .config file. Search for "_defconfig" using 'find . -name "*_defconfig", output path is usually
+"arch/arm64/configs/"/ The file we are looking for is bcm2711_defconfig. (Read the first 2 lines of this page)
+
+takeoff@takeoff-ASUS-TUF-Gaming-F15-FX506LH-FX566LH:~/code/Rspi_linux$ make ARCH=arm64 bcm2711_defconfig
+  HOSTCC  scripts/basic/fixdep
+  HOSTCC  scripts/kconfig/conf.o
+  HOSTCC  scripts/kconfig/confdata.o
+  HOSTCC  scripts/kconfig/expr.o
+  LEX     scripts/kconfig/lexer.lex.c
+  YACC    scripts/kconfig/parser.tab.[ch]
+  HOSTCC  scripts/kconfig/lexer.lex.o
+  HOSTCC  scripts/kconfig/menu.o
+  HOSTCC  scripts/kconfig/parser.tab.o
+  HOSTCC  scripts/kconfig/preprocess.o
+  HOSTCC  scripts/kconfig/symbol.o
+  HOSTCC  scripts/kconfig/util.o
+  HOSTLD  scripts/kconfig/conf
+#
+# configuration written to .config
+#
+
+step3: Prepare for external modules support from the current source tree of raspberry pi 4.
+make ARCH=arm64 CROSS_COMPILE=aarch64-linux-gnu-gcc prepare modules_prepare
+
+step4: Kernel source code compilation which generates 'uImage' along with 'device tree source' and 'dtb'
+(device tree binary) files.
+
+

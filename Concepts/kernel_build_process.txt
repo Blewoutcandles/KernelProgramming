@@ -81,5 +81,44 @@ or
 make -C /lib/modules/$(uname -r)/build/ M=$PWD clean
 
 Build process for helloworld module against target device:
-Modification to above step ii, make command
-make ARCH=arm CROSS_COMPILE=arm-linux-gnueabihf- -C /home/takeoff/code/Rspi_linux/kernel/ M=$PWD modules
+
+1.Modification to above step ii, our module must be compiled against the kernel modules, so prepare it first using
+make command under the path: /home/takeoff/code/Rspi_linux/
+make ARCH=arm64 CROSS_COMPILE=aarch64-linux-gnu- -C /home/takeoff/code/Rspi_linux/ M=$PWD modules
+
+2. Now compile our modules using make:
+make ARCH=arm64 CROSS_COMPILE=aarch64-linux-gnu- -C /home/takeoff/code/Rspi_linux/ M=$PWD modules
+eg:(telling the compiler to go inside the source directory and help build our local modules)
+takeoff@takeoff-ASUS-TUF-Gaming-F15-FX506LH-FX566LH:~/code/MyModules$ make ARCH=arm64 CROSS_COMPILE=aarch64-linux-gnu- -C /home/takeoff/code/Rspi_linux/ M=$PWD modules
+make: Entering directory '/home/takeoff/code/Rspi_linux'
+make[1]: Entering directory '/home/takeoff/code/MyModules'
+  MODPOST Module.symvers
+  CC [M]  001Helloworld.mod.o
+  CC [M]  .module-common.o
+  LD [M]  001Helloworld.ko
+make[1]: Leaving directory '/home/takeoff/code/MyModules'
+make: Leaving directory '/home/takeoff/code/Rspi_linux'
+
+3. View information: 
+i. To view file information: file 001Helloworld.ko, output would be:
+001Helloworld.ko: ELF 64-bit LSB relocatable, ARM aarch64, version 1 (SYSV), 
+BuildID[sha1]=0e4e1e3cc50d825b52030ac9aea271bebe39c557, not stripped
+
+ii. To view the module information:
+modinfo 001Helloworld.ko
+output:
+filename:       /home/takeoff/code/MyModules/001Helloworld.ko
+description:    THIS IS MY FIRST KERNEL MODULE
+author:         marzjukm7@gmail.com
+license:        GPL
+srcversion:     92769FEFF90D230C3C810B0
+depends:        
+name:           001Helloworld
+vermagic:       6.18.26-v8+ SMP preempt mod_unload modversions aarch64
+
+iii. To analyze the various section of the kernel object file.
+aarch64-linux-gnu-objdump -h 001Helloworld.ko
+
+
+
+Building a kernel module  (In tree):
