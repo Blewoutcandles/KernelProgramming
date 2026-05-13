@@ -1,6 +1,6 @@
 Steps to create a local makefile:
 1. Define a kbuild variable as below: obj-<X> := <module_name>.o
-obj -<X> is a build variable and <X> takes one of the below values
+obj-<X> is a build variable and <X> takes one of the below values
 X = n, Do not compile the module.
 X = y, Compile the module and link with kernel image.
 X = m, Compile as dynamicaly loadable kernel module.
