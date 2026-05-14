@@ -122,3 +122,92 @@ aarch64-linux-gnu-objdump -h 001Helloworld.ko
 
 
 Building a kernel module  (In tree):
+* Instead of building our modules externally, we can actually build it along with our kernel modules.
+* If you want to list your kernle module selection in kernel menuconfig, then create and use a Kconfig file.
+
+Steps to add in-tree module to kernel menu configuration:
+1. Create a folder in drivers/char/my_c_dev
+
+2. copy main.C or helloworld.c whatever the module name is.
+takeoff@takeoff-ASUS-TUF-Gaming-F15-FX506LH-FX566LH:~/code/Rspi_linux/drivers/char$ mkdir my_c_dev
+takeoff@takeoff-ASUS-TUF-Gaming-F15-FX506LH-FX566LH:~/code/Rspi_linux/drivers/char$ cd my_c_dev/
+takeoff@takeoff-ASUS-TUF-Gaming-F15-FX506LH-FX566LH:~/code/Rspi_linux/drivers/char/my_c_dev$ touch Kconfig
+takeoff@takeoff-ASUS-TUF-Gaming-F15-FX506LH-FX566LH:~/code/Rspi_linux/drivers/char/my_c_dev$ cp ../../../../MyModules/001Helloworld.c .
+takeoff@takeoff-ASUS-TUF-Gaming-F15-FX506LH-FX566LH:~/code/Rspi_linux/drivers/char/my_c_dev$ ls
+001Helloworld.c  Kconfig
+
+3. create a Kconfig file and add the below contents:
+menu "my_custom_modules"
+  config CUSTOM_HELLOWORLD
+    tristate "hello world module support"
+    default m
+endmenu
+Exp:When configuring the kernel we will have options to actually modify the kernel settings.
+* Syntax should start with 'menu' and ends with 'endmenu'
+* CUSTOM_HELLOWORLD -> kernel identifier, config name. The config keyword preceeds the configname or 
+the kernel identifier. config name should be in upper case. This config name will later appear in .config file.
+The kernel module identifies this module using its kernel identifier or config name. This module can either be 
+included or excluded(selected or deselected during the build process). This will be determined by state of the modules. 
+* tristate -> there are 3 states to the modules. m, y or n. tristate will be followed by description and the 
+state of the module can be determined using default keyword with options of m, y or n.
+* Every module included here will have their own config name.
+
+4. Add the local Kconfig entry to upper level Kconfig
+* Navigate to the immediate parent folder and add the  current Kconfig to the parent Kconfig:
+source your new directory my_c_dev
+eg: add 'source "drivers/char/my_c_dev/"' to end of the parent Kconfig file.
+
+5. create a local Makefile and add this content:
+obj-$(CONFIG_CUSTOM_MODULES) += 001Helloworld.o
+* To determine the module state we have give $(config name given in the Kconfig file see step 3 and should be preceeded 
+by 'CONFIG_')
+6. add obj-<config_item> +=  <module>.o in to Makefile. Refer above example command.
+7. add local level makefile to higher level makefile.
+Navigate to the immediate parent folder makefile, and add 
+obj-y += my_c_dev/
+-y to make sure our module is always included in the build process, also selecting folders don't have config items.
+We just want our custom folder to be always included.
++= my_c_dev/ -> provide them with the path to include the local makefile
+If the above obj-y += my_c_dev/ is missed then the parent makefile dont know our my_c_dev folder exist and it 
+needs to get compiled. Once this staement is added the parent make file will make jump to our local make file 
+to build our 001Helloworld module.
+Dont confuse with config_name in Kconfig that is kernel module selection or deselection.
+
+* Once this is done we can go ahead with menuconfig with cmd inside raspi_linux source:
+make ARCH=arm64 menuconfig
+
+* This will create a .config file inside the Rspi_linux directory. There you could find the Module as 
+#my custom modules  -> see Kconfig file in drivers/char/my_c_dev
+CONFIG_CUSTOM_MODULES=m 
+
+* Now build the modules using the below command:
+takeoff@takeoff-ASUS-TUF-Gaming-F15-FX506LH-FX566LH:~/code/Rspi_linux$ make ARCH=arm64 \
+CROSS_COMPILE=aarch64-linux-gnu- modules
+
+Branch Target Identification support (ARM64_BTI) [Y/n/?] y
+Enable support for E0PD (ARM64_E0PD) [Y/n/?] y
+Memory Tagging Extension support (ARM64_MTE) [Y/n/?] (NEW) 
+  CALL    scripts/checksyscalls.sh
+  UPD     kernel/config_data
+  GZIP    kernel/config_data.gz
+  CC [M]  kernel/configs.o
+  AR      drivers/char/my_c_dev/built-in.a
+  CC [M]  drivers/char/my_c_dev/001Helloworld.o //see here our modules is getting built
+
+* Now run modinfo on the build 001Helloworld.ko file.
+takeoff@takeoff-ASUS-TUF-Gaming-F15-FX506LH-FX566LH:~/code/Rspi_linux/drivers/char/my_c_dev$ modinfo 001Helloworld.ko
+
+filename:       /home/takeoff/code/Rspi_linux/drivers/char/my_c_dev/001Helloworld.ko
+description:    THIS IS MY FIRST KERNEL MODULE
+author:         marzjukm7@gmail.com
+license:        GPL
+srcversion:     92769FEFF90D230C3C810B0
+depends:        
+intree:         Y                         ------> notice the modules shows it is now in-tree which now removes
+                                                  kernel tainting warning message.
+name:           001Helloworld
+vermagic:       6.18.26-v8+ SMP preempt mod_unload modversions aarch64
+
+
+
+

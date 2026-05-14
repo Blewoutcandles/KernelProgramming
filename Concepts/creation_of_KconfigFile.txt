@@ -1,0 +1,13 @@
+takeoff@takeoff-ASUS-TUF-Gaming-F15-FX506LH-FX566LH:~/code/Rspi_linux/drivers/char$ mkdir my_c_dev
+takeoff@takeoff-ASUS-TUF-Gaming-F15-FX506LH-FX566LH:~/code/Rspi_linux/drivers/char$ cd my_c_dev/
+takeoff@takeoff-ASUS-TUF-Gaming-F15-FX506LH-FX566LH:~/code/Rspi_linux/drivers/char/my_c_dev$ touch Kconfig
+takeoff@takeoff-ASUS-TUF-Gaming-F15-FX506LH-FX566LH:~/code/Rspi_linux/drivers/char/my_c_dev$ cp ../../../../MyModules/001Helloworld.c .
+takeoff@takeoff-ASUS-TUF-Gaming-F15-FX506LH-FX566LH:~/code/Rspi_linux/drivers/char/my_c_dev$ ls
+001Helloworld.c  Kconfig
+
+Add this in Kconfig file:
+menu "my custom modules"
+config CUSTOM_MODULES
+	tristate "hello world module support"
+	default m
+end menu

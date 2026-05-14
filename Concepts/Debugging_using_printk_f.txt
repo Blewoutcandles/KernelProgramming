@@ -1,0 +1,47 @@
+* printf is one of the best debugging tool available in user space application.
+* When in kernel space, we don't have access to c standard libraries to access functions like printf or scanf.
+* Kernel has it's own API called printk where k -> kernel space running, syntax follows exact same as printf.
+* Using printk, the message will go to kernel ring buffer simply we call "kernel log", we can print and control kernel
+ring buffer with command dmesg.
+* suppose if you want to check last 5 kernel messages, just run :
+dmesg | tail -5
+dmesg | head -20
+* printk does not support floating point formats like %e, %f, %g.
+* There are 8 such log levels the debugging printk statements are treated as level 4 KERN_WARNING, lower the log level 
+higher its priority. To see the log levels: include/linux/kern_levels.h . The logs will be used by the kernel to find
+the priority of the messages and based on the priority kernel decides whether the message should be presented to the
+user immediately, printing to console.
+* All kernel messages have their own log levels. We have to specify the log level while using printk,
+printk("Hello this is kernel code running\n"); -> If no log levels are specified then kernel will add the default log
+level set by the kernel config item, CONFIG_MESSAGE_LOGLEVEL_DEFAULT whose value is 4.
+* printk(KERN_WARNING "Hello this is kernel code running\n");
+KERN_WARNING -> LOG level
+note: no comma between the log level and the printk statement.
+* To configure the default log level of the messages run: 
+make ARCH=arm64 menuconfig
+kernel_hacking -> printk and dmesg options -> default log level for messages.
+
+Significance of kernel log level:
+printk(KERN_ALERT "Hello this action should be taken immediately");
+printk(KERN_WARNING "Hello this is just for your information");
+* The kernel log level will be compared to the current console level, if the kernel log level is lower than the current
+console log level then message will be printed out in the console.
+* By default the console log level will have the value of config item: CONFIG_CONSOLE_LOGLEVEL_DEFAULT. The default 
+value is set to 7. You can change it via kernel menuconfig or running commands:
+cat /proc/sys/kernel/printk -> to view the current log level
+echo 6 > /proc/sys/kernel/printk -> to change the log level at run time.
+
+Through menuconfig changing the log level of the console is :
+* To configure the default log level of the console run: 
+make ARCH=arm64 menuconfig
+kernel_hacking -> printk and dmesg options -> default console log level.
+
+takeoff@takeoff-ASUS-TUF-Gaming-F15-FX506LH-FX566LH:~$ cat /proc/sys/kernel/printk
+4	        4	        1              	7
+cohsole   kernel
+log       message
+level    log level
+
+NOTE: The messages will appear on the console only when it has lower log level compared to kernel console log level.
+if the messages have log level equals or higher than kernel console log level it just simply won't get printed in the 
+console.

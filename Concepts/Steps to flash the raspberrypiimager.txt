@@ -6,5 +6,4 @@ ii.select disk 1
 iii.clean
 4. open etcher choose os and flash yahoo ready to go!!
 
-The Raspberry Pi 4 uses a 64-bit ARM Cortex-A72 processor based on the ARMv8-A architecture. 
-This quad-core processor (within the Broadcom BCM2711 SoC) runs at 1.5 GHz or 1.8 GHz, 
+ 
