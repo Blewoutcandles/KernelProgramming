@@ -1,0 +1,42 @@
+Device Driver:
+* A piece of code that configures and manages a device.
+* Device Drivers knows how to configure the device, sending data to the device, it knows how to process requests which 
+originate from the device.
+* When it is loaded into the operating system such as linux, it exposes interface to the user application, so that it
+could communicate with the device.
+* Without the device driver operating system would have no idea of how to deal with a device.
+hardware -> devicedriver -> devicefiles -> applications
+xyz      -> devdrv of xyz-> /dev/xyz    -> app1, app2, system, write, open, read.
+* Device drivers bears the burden of interacting with hardware and export the interfaces to the applications that 
+could make use of to communicate.
+Kernel space:
+    character device driver             Block device drivers                Network device drivers
+Hw space:
+    Char. Devices (RTC,                 Storage Devices(sdmmc, eeprom,      Network devices (ethernet, wifi, 
+    keyboard,sensors etc)               flash, harddisk)                    bluetooth) 
+
+This course: Character drivers.
+Character drivers:
+* Access data sequentially from the device i.e, byte by byte (like a stream of characters) not as chunk of data.
+* Sophisticated buffer strategies are not involved.
+* The byte written directly goes to device without any intermediate buffering or delayed write back or dirty buffer
+management.
+* eg: keybaord, sensors, RTC, serial and parallel port etc..,
+
+Block drivers:
+* The device which handles data in chunks or blocks.
+* Complicated than character drivers because block drivers should implement advanced buffering strategies to read and 
+write to the block devices, and disk caches are involved.
+* eg: mass storage devices such as hard disks, sdmmc, Nand flash, USB camera etc..,
+
+Device file:
+* Devices are accessed as a file in unix/linux systems. It is a special file or a node which gets populated in /dev/
+directory during kernel boot time or device/driver hot plug events.
+* By using device file, user application and drivers communicate with each other.
+* Device files are managed as part of the VFS subsystem of the kernel.
+eg: user application <-> /dev/xyz <-> kernel module/driver <-> printer
+Inside the /dev/ directory:
+brw-rw----   1 root    disk    259,     3 May 14 12:17 nvme0n1p3 -> block device starts with b
+crw-rw----+  1 root    video   234,     0 May 14 12:17 media0    -> character devices start with c
+drwxr-xr-x   2 root    root             0 May 14 12:17 pts       -> directory
+
