@@ -1,0 +1,44 @@
+User application:
+open("/dev/rtc", ...);
+read(fd, ..);
+write(fd, ...);
+                            USER SPACE
+ ^
+ |
+ v
+
+ GNU c library
+
+ ^
+ |
+ v
+
+ System call handlers and service routines                  KERNEL SPACE
+
+ |
+ v
+
+ VFS    < - >  open(), read(), write()   <-->  Hardware
+filesystem     kernel module or driver
+
+Device Number (Major and Minor):
+* The device gets assigned a device number.
+* The device driver file /dev/driverfile will have number as 4 : 0, where 4 -> device number and 0 -> device instance.
+* suppose /dev/rtc0 4:0, /dev/rtc1 4:1, /dev/rtc2 4:2
+4 -> Major number and 0, 1, 2, 3 -> minor number
+* When the open() called from user space to device driver, the request is sent to VFS identifies the device number 
+4 here and compares it with driver registration list, the driver has to get registered so that VFS could send the 
+request to drivers method. Registering the device is called character device add (CDEV_ADD).
+As from before example:
+brw-rw----   1 root    disk    259,     3 May 14 12:17 nvme0n1p3 -> block device starts with b
+crw-rw----+  1 root    video   234,     0 May 14 12:17 media0    -> character devices start with c
+column ->                  device_no   minor_no
+minor_no helps VFS to differentiate between the device files for eg, /dev/rtc0 /dev/rtc1 , sda0, sda1.
+
+Connection establishment between device file access and the driver:
+* Create device number.
+* Create device files.
+* Make a char device registration with the VFS (CDEV_ADD).
+* Implement the device's file operation methods for open, read, write, llseek etc.
+
+See coding for this implementation
