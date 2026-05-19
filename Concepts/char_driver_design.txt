@@ -41,4 +41,21 @@ Connection establishment between device file access and the driver:
 * Make a char device registration with the VFS (CDEV_ADD).
 * Implement the device's file operation methods for open, read, write, llseek etc.
 
-See coding for this implementation
+See coding for this implementation:
+
+First step: Create a device number ask the kernel to dynamically allocate the device numbers.
+Kernel API and Utilities:
+alloc_chrdev_region();  -> create a device number
+cdev_init();            -> Make a char device registration with the VFS
+cdev_add(); 
+class_create();         -> Crete device files.
+device_create();
+
+Every creation function has it's own deletion function:
+unregister_chrdev_region(); -> include/linux/fs.h
+cdev_del();                 -> include/linux/cdev.h
+class_destroy();            -> include/linux/device.h 
+device_destroy();           
+copy_to_user();             -> include/linux/uaccess.h
+copy_from_user();
+VFS structure definition    -> include/linux/fs.h
