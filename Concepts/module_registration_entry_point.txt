@@ -25,3 +25,5 @@ MODULE_INFO(name, "string_value")
 eg : MODULE_INFO(board, "BeagleBone");
 How to view the module info from a module with .ko extension: 
 arm-linux-gnueabihf-objdump -d -j .modinfo helloworld.ko
+for raspberry pi:
+aarch64-linux-gnu-objdump -d -j .modinfo helloworld.ko

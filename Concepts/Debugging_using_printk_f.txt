@@ -38,7 +38,7 @@ kernel_hacking -> printk and dmesg options -> default console log level.
 
 takeoff@takeoff-ASUS-TUF-Gaming-F15-FX506LH-FX566LH:~$ cat /proc/sys/kernel/printk
 4	        4	        1              	7
-cohsole   kernel
+console   kernel
 log       message
 level    log level
 

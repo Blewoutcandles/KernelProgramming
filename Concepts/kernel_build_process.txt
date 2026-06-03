@@ -59,7 +59,7 @@ eg:
 takeoff@takeoff-ASUS-TUF-Gaming-F15-FX506LH-FX566LH:~/code/MyModules$ uname -r
 6.8.0-111-generic
 
-ii. Host libraries will be in '/lib/modules/6.8.0-111-generic/', give the make command as follows:
+ii. Host libraries will be in '/lib/modules/6.8.0-111-generic/build', give the make command as follows:
 make -C /lib/modules/6.8.0-111-generic/build/ M=$PWD modules
 
 
@@ -148,8 +148,8 @@ Exp:When configuring the kernel we will have options to actually modify the kern
 the kernel identifier. config name should be in upper case. This config name will later appear in .config file.
 The kernel module identifies this module using its kernel identifier or config name. This module can either be 
 included or excluded(selected or deselected during the build process). This will be determined by state of the modules. 
-* tristate -> there are 3 states to the modules. m, y or n. tristate will be followed by description and the 
-state of the module can be determined using default keyword with options of m, y or n.
+* tristate -> there are 3 states to the modules. m, y or n. 'tristate' will be followed by description and the 
+state of the module can be determined using 'default' keyword with options of m, y or n.
 * Every module included here will have their own config name.
 
 4. Add the local Kconfig entry to upper level Kconfig
