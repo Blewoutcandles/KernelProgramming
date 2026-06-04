@@ -72,3 +72,6 @@ Ultimately saying, assigning the owner field the address of __this_module which 
 from being unloaded while the structure cdev in use. (for eg, this header will not get unloaded until this cdev structure is in use)
 
 Refer file operations structure in linux/fs.h
+
+cdev_add: Adds a char device to kernel VFS
+int cdev_add(struct cdev *p, dev_t dev, unsigned int count);

@@ -1,0 +1,20 @@
+Structural representations:
+fd = open("/dev/mychardev", O_RDWR);
+|           USERSPACE
+V 
+/dev/mychardev
+|
+|
+V           KERNELSPACE                                         DRIVER_METHODS
+Virtual File System           ----------------->             int mychardev_open(struct inode* inode, struct file *filp);
+*Opens a file by                                                                                |                   |
+creating a new file                                             Pointer of the Inode associated                 Pointer to
+object and assign in                                            with filename                                   the file object.
+to corresponding 
+inode object.
+
+Important datastructures involved in kernel space for the above operations are:
+* struct file
+* struct inode
+* struct cdev
+* struct file_ops
