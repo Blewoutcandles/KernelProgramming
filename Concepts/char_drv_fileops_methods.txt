@@ -18,3 +18,49 @@ Important datastructures involved in kernel space for the above operations are:
 * struct inode
 * struct cdev
 * struct file_ops
+
+Inode objects:
+* Unix makes clear distinction between contents of the file and the information about the file.
+* struct inode -> general information about a file.
+* struct file -> tracks interaction on an open file by the user process.
+* Inode contains all the information needed by the file system to handle a file. simple analogy: fs uses inode to handle a file.
+* Each file has it's own inode object, which file system uses to identify the file.
+* Each inode object is associated with an inode number, which uniquely identifies the file with the filesystem.
+* The inode object is created and stored in memory as a new file is created.
+
+File objects:
+* Whenever a file is opened a file object is created in kernel space, if a file is opened 10 times, 10 file objects will be created.
+* Stores information about the interaction between an open file and the process.
+* The information exist only in kernel memory during the period in which the process maintain transaction with the openfile.
+* The contents of the file object is not written back to the disks unlike inode. The information is irrelevant as soon as the file 
+is closed.
+* The opened file may be regular or device file. The kernel modifies the content of the file object during the transaction between
+process and the file opened.
+
+When device file gets created:
+1. Create device driver file using udev, when this gets created definitely inode object will get created.
+2. inode object gets created in memory and inode's i_rdev field is initialized with device number.
+3. inode object's i_fop field is set to dummy default file operations(def_chr_fops)
+
+When user process execute open system call:
+1. User invokes open system call on the device file. (operations initiated so file object will get created)
+2. file object gets created.
+3. inode's i_fop gets copied to file object's f_op(dummy file operations of char dev file).
+4. The open function of dummy default file operations gets called. (chrdev_open())
+5. inode object's i_cdev field is initialized with cdev which we added during cdev_add(look up happens using inode -> i_rdev 
+in cdev_map). Remember struct cdev contains a field of fops.
+6. inode -> cdev -> fops (real file operation of your driver) gets copied to file object member file -> f_op
+7. file -> f_op -> open method gets called (read open method of our char driver) to invoke our custom char driver methods.
+
+open    <----------------------------                                             USERSPACE
+------------------------------------------------------------------------------------------
+Inode object                         \                                          KERNELSPACE
+i_cdev                                \
+|                                      \
+v                                      /fd from file object returns to userspace after operation
+cdev                       File object/
+*                                    /
+F_ops    ----------------> f_op        ---------read----------->            Driver
+*                                      ---------write---------->
+*                                      ---------open----------->
+*
