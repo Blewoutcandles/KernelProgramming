@@ -1,0 +1,74 @@
+Dynamically register a range of char devices numbers 
+int alloc_chrdev_region(dev_t *dev, unsigned int baseminor, unsigned int count, const char* name);
+dev_t *dev              -> The device number will be updated here.
+unsigned int baseminor  -> first of the requested range of the minor numbers like 0 (first minor number)
+unsigned int count      -> number of minor numbers required if count = 7 and first minor is 0 
+                           then devno:0 -> devno:6 will be created
+const char* name        -> name of the associated device or driver
+
+Datatypes:
+dev_t -> type alias of u32, out of 32, 12 bits -> major number and 20 bits -> minor numbers.
+Macros to obtain the major number: MAJOR(device_number)
+Macros to obtain the minor number: MINOR(device_number)
+These macros available in linux/kdev_t.h
+To convert the major and minor numbers into device numbers: MKDEV(int major, int minor).
+
+cdev_add:
+void cdev_init(struct cdev *cdev, const struct file_operations *fops); -> implemented in fs/char_dev.c
+struct cdev -> structure to initialize 
+struct file_operations -> file operations for this device. We are required to implement 
+                          system call handlers like(read,write,seek etc)
+
+struct cdev{
+    struct kobject kobj;
+    struct module *owner; 
+    const struct file_operations *ops; 
+    struct list_head list;
+    dev_t dev;
+    unsigned int count;
+} __randomize_layout;
+
+i. const struct file_operations *ops -> pointer to file operation structure of the driver.
+ii.struct module* owner -> pointer to the module that owns this structure, usually initialized to THIS_MODULE, this pointer
+used to prevent the module from being unloaded while the structure is in use.
+
+THIS_MODULE:
+* A macro which resolves into pointer to struct module variable which corresponds to our current module.
+* you can find this in linux/export.h
+extern struct module (&__this_module)
+#define THIS_MODULE (&__this_module)
+see below to understand this:
+akeoff@takeoff-ASUS-TUF-Gaming-F15-FX506LH-FX566LH:~/code/Rspi_linux/drivers/char/002Pseudo_char_driver$ nm ../my_c_dev/001Helloworld.ko 
+0000000000000000 r $d
+0000000000000028 d $d
+0000000000000000 d $d
+0000000000000000 d $d
+0000000000000000 r $d
+0000000000000000 d $d
+0000000000000000 r $d
+0000000000000000 r $d
+0000000000000000 t $x
+0000000000000000 t $x
+0000000000000000 T cleanup_module
+0000000000000008 T init_module
+0000000000000008 t my_k_module_begin
+0000000000000000 t my_k_module_exit
+0000000000000018 r _note_18
+0000000000000000 r _note_19
+                 U _printk
+0000000000000000 D __this_module        <--------------------------------
+
+Also open 001Helloworld.mod.c file.
+#include <linux/module.h>
+#include <linux/export-internal.h>
+#include <linux/compiler.h>
+
+MODULE_INFO(name, KBUILD_MODNAME);
+
+__visible struct module __this_module        <-------------------------------- The build system added this variable
+__section(".gnu.linkonce.this_module") 
+
+Ultimately saying, assigning the owner field the address of __this_module which is the current module helps to prevent the module
+from being unloaded while the structure cdev in use. (for eg, this header will not get unloaded until this cdev structure is in use)
+
+Refer file operations structure in linux/fs.h
