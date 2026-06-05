@@ -1,0 +1,64 @@
+Open method:
+
+int mychardev_open(struct inode* inode, struct file *filp); -> returns 0 if successful or negative value to indicate error.
+The above method can be implemented or ignored, if ignored the call will always succeed.
+General behaviour:
+* Initialize the device to respond to read/write operations.
+* Check open permission (O_RDONLY, O_WRONLY, O_RDWR)
+* Identify the device being opened using minor number.
+* prepare device private data structure if required.
+* update f_pos if required.
+* open method is optional.
+
+Close method:
+close(fd);      /dev/mychardev                                                 USERSPACE
+--------------------------------------------------------------------------
+VFS                                                             KERNELSPACE
+Releases the file object
+called when the last reference      ------------------->   int mychardev_release(struct inode* inode, struct file* filp);
+to an open file is closed-that is when 
+the f_count filed of the file object 
+becomes 0.
+Behaviour:
+* If open() brings device to active mode from low power mode, release() will send the device back to low power mode.
+* Should leave the device in its default state, which was before open() call.
+* free any data structures allocated during open () call.
+* If the device does not respond, then you can issue negative errors to the caller().
+
+Read method:
+read(fd, buff, 20);      /dev/mychardev                                        USERSPACE
+|---------------------------------------------------------------------------------------
+v
+VFS                                                             KERNELSPACE
+--------------------------> ssize_t mychardev_read(struct file* filp, char __user* buff, size_t count, loff_t *f_pos){}
+ssize_t mychardev_read(struct file* filp, char __user* buff, size_t count, loff_t *f_pos){}:
+buff -> pointer of user buffer.
+f_pos -> pointer of current file position from which the read has to begin.
+count -> read count given by user.
+__user -> optional macro which alerts the user level pointer so cannot be trusted for direct referencing. Do not dereference
+this pointer directly as we may not be aware of its validity (may be a invalid pointer). Use methods like copy_to_user and
+copy_from_user.
+    -> Gcc  does not care using __user, this is instead checked by sparse, a semantic checker tool of linux to find possible
+kernel faults.
+
+What the function does:
+* Start reading from position pointer of the file to 'count' number of bytes, update the f_pos after successfully reading
+the bytes.
+* Return the number of bytes successfully read, if not return errors, if there is nothing to read return 0 (EOF).
+* Return value less than the number of successfully read bytes does not indicate error.
+
+llseek():
+same as above structure.
+loff_t  mychardev_llseek(struct file* filp, loff_t off, int whence){} -> used to alter the current file position
+whence -> origin which is of
+SEEK_SET - The file offset is set to 'off' bytes.
+SEEK_CUR - The file offset is set to current location + 'off' bytes.
+SEEK_END - The file offset is set to size of the file + 'off' bytes.
+Return - should return the new file position or error. 
+
+struct initialization: struct name variable={value1, value2, value3}; c89 style order is important.
+struct name variable={.member1 = value1, .member2 = value2, .member3 = value3}; c99 designated initializer.
+using bitfields
+struct name {datatype member1 : 3; 
+            datatype member2 : 3;}; uses 3 bits for the data types;
+nextpart: dynamic device file creation

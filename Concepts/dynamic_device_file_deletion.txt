@@ -1,0 +1,18 @@
+Resources clean up should be done in reverse chronological order of init function.
+Destroy a device structure:
+syntax: void device_destroy(struct class* class, dev_t devt);
+param 1: pointer to the struct class that this device was registered with.
+param 2 : device number.
+
+Destroy a class structure:
+void class_destroy(struct class* cls);
+param 1: pointer to the struct class that is to be destroyed.
+
+Remove cdev registration from the kernel VFS:
+void cdev_del(struct cdev *p);
+param1: struct cdev to be removed.
+
+Unregister a range of device numbers:
+void unregister_chrdev_region(dev_t from, unsigned int count);
+param1: first in the range of numbers to unregister - device number if to say otherwise.
+param2: number of device number to unregister - minor number.  
