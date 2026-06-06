@@ -1,0 +1,39 @@
+Read method implementation:
+
+Device memory buffer       ---copy_to_user()--->            User buffer 
+*                                        Read               (memory of the address space)
+KERNEL SPACE                                            USERSPACE 
+(NON- SWAPPABLE)                                        (SWAPPABLE)
+
+Data copying between kernel and userspace:
+* copy_to_user
+* copy_from_user
+Roles of 2 functions:
+* Copying data between user space and kernel space.
+* check the user space pointer is valid or not.
+* If the pointer is invalid, no copy is performed.
+* If an invalid address is encountered during the copying process.only part of the data is copied,
+in both cases returns value the amount of memory still to be copied.
+
+ssize_t mychardev_read (struct file *filp, char __user *buffer, size_t count, loff_t *f_pos);
+Exp:
+* Check the user requested 'count' value against DEV_MEM_SIZE of the device.
+* if(f_pos(current_file_pos) + count > DEV_MEM_SIZE) count = DEV_MEM_SIZE - f_pos;
+* copy 'count' number of bytes from device memory to user buffer.
+* update the f_pos
+* return number of bytes successfully read or return error.
+* if f_pos is at EOF , then return 0.
+NOTE: Whether it is read, write or llseek, the f_pos will get altered during any of these operations. And 
+for EOF, if total size is 512 ranging from 0 to 511, 512 position is EOF.
+* user level memory pointers cannot be trusted and thus cannot be directly dereferenced. The above 2 functions of kernel
+the copying will not take place if the pointer is invalid.
+
+unsigned long copy_to_user(void __user *to, const void *from, unsigned long n)
+to -> destination address space.
+from -> kernel source address.
+n -> number of bytes to copy.
+return 0 -> success or number of bytes that could not be copied.
+If return non-zero value, you should assume that there was a problem in copying, so return appropriate error code value.
+(-EFAULT), this explanation goes same for 
+
+unsigned long copy_from_user(void *to, const void __user *from, unsigned long n)
