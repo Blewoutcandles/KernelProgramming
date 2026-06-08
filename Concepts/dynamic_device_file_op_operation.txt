@@ -37,3 +37,17 @@ If return non-zero value, you should assume that there was a problem in copying,
 (-EFAULT), this explanation goes same for 
 
 unsigned long copy_from_user(void *to, const void __user *from, unsigned long n)
+
+Write method implementation:
+ssize_t mychardev_write(struct file* filp, const char __user * buff, size_t count, loff_t* f_pos)
+*check user requested count value against DEV_MEM_SIZE of the device.
+* copy count no of bytes from user buffer to device memory
+* update the current file position.
+* Return the no of bytes successfully written or error code.
+
+llseek():
+loff_t mychardev_lseek(struct file* filp, loff_t off, int whence)
+
+if(whence = SEEK_SET) filp -> f_pos = off;
+if(whence = SEEK_CUR) filp -> f_pos + off
+if(whence = SEEK_END) filp -> f_pos = DEV_MEM_SIZE + off;

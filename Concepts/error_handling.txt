@@ -1,0 +1,9 @@
+Error Handling:
+* Kernel macros are available to deal with return of error pointers.
+Following are some of the macros:
+* IS_ERR()
+* PTR_ERR()
+* ERR_PTR()
+Found in include/linux/err.h
+* If some kernel function fail and return NULL, we have no clue of finding what does it return, 
+so instead it returns pointer to the error code.
