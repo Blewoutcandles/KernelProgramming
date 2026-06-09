@@ -1,0 +1,59 @@
+Here the mychar device driver is going to deal with multiple drivers by a single driver.
+
+Private data of the device(Device specific information):
+
+serial number  |   A memory area    | Permission RDONLY, WRONLY, RDWR
+*                  Pcdev-x
+*               --------size------
+*             start
+*            address
+Every device has it's own private data.
+totally four information:
+1. Serial number
+2. Start address
+3. Permission
+4. Size of the memory area
+
+Device Driver Data Structures:
+1.Drivers private data
+2.Device private data
+
+Device private data structure:
+struct pcdev_private_data{
+    char* buffer;
+    unsigned size;
+    const char* serial_number;
+    int perm;
+    struct cdev cdev;
+};
+
+Driver private data:
+struct pcdrc_private_data{
+  int total_devices;
+  struct pcdev_private_data pcdev_data[NO_OF_DEVICES];  
+};
+
+While implementing the open operation:
+1. Driver must identify which device is accessing the device file.
+2. It should have its private data structure ready.
+
+container_of : provide the pointer of the member in a structure, this macro will give the pointer
+of the structure in which the member is embedded in and is found in include/linux/kernel.h
+In simpler terms, this macro returns the address of the structure given the structure member's 
+address.
+Syntax: 3 arguments: a pointer, type of the container, and the name of the member the pointer 
+refers to.
+#define container_of(ptr, type, member)
+for e.g, refer above structure
+container_of(&total_devices, struct pcdrc_private_data, total_devices)
+
+
+f_mode : 
+* One of the fields of the struct file defined in linux/fs.h
+* Can check this field in your driver to understand access mode requested from user space app.
+* f_mode has bit fields to indicate access modes read or write. Use macros :FMODE_READ, FMODE_WRITE
+to decode this field (linux/fs.h)
+Decoding f_mode bitfields:
+filp->f_mode & FMODE_READ file is opened just for read or read write
+filp->fmode & FMODE_WRITE file is opened just for write or read-write
+(filp->fmode & FMODE_READ) && !(filp->fmode & FMODE_WRITE) file is opened for read only.
