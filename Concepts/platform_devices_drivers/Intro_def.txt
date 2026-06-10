@@ -1,0 +1,87 @@
+BUS:
+* It is a collection of electrical wiring which transfer information (data or address or control)
+between devices.
+
+Platform Bus:
+* Used by Linux Device Model to represent all the non-discoverable busses of an embedded platform.
+* It is a pseudo bus or Linux's virtual bus.
+* These are called virutal bus since they are not auto discoverable and dont have hot plugging 
+capability.
+
+Discoverable vs non-discoverable:
+* Discoverable devices like in pc are connected via pci bus, which have the ability to detect the 
+device attached using specific configuration register by accessing the device space thus no manual
+feeding of information to the devices required.
+* For non-discoverable devices, they are not directly connected to pci, thus needs to discover manual
+like spi, i2c, uart etc..,
+* It also makes sense that the peripherals already avaialble in soc need not be connected through
+pci bus to recognize them since they dont support hot plugging event or device enumeration.
+* So non-discoverable peripherals are connected to no virtual non-discoverable bus known as 
+platform bus.
+* All these non-discoverable peripherals are connected to processor via platform bus.
+
+Discovery of devices:
+* Every device has it's own configuration data and resources, which needs to be reported to os running
+on the system.
+* The OS can auto discover these data through device-enumeration.
+* Enumeration is a process through which os can inquire and retrieve information such as type of device
+, the manufacturer, device configuration, and all the devices connected to a given bus.
+* Once OS gathers information about a device, it can autoload the appropriate driver for the device.
+In pc scenario, buses like pci and usb support auto enumeration/hot plugging of devices.
+* On embedded systems, this is not the case since most peripherals are connected to cpu since they
+dont support auto discovery or device enumeration.
+* All platform devices are part of the Linux device model, so the information about these devices
+must be fed to linux either the compile time or boot time of the kernel.
+
+Device Information:
+1. Memory or IO mapped base address and range information.
+2. IRQ Number on which the devices issues interrupt to the processor.
+3. Device identication information.
+4. DMA channel information.
+5. Device address.
+6. Pin configuration.
+7. Power, voltage parameters.
+8. Other device specific data.
+
+Ways to Add Platform Devices to Kernel:
+* During compilation of kernel:
+1. Static method.
+2. Hardware details are part of kernel files.(board file, drivers)
+3. Deprecated and not recommended.
+
+* Loading dynamically:
+1.As a kernel module - not recommended.
+
+* During kernel boot: 
+1.Device tree blob - latest and recommended.
+
+Board file approach:
+* This method was used before kernel version 3.7 to add hardware configuration details to the kernel.
+i. Details about the onboard peripherals.
+ii.Pin configuration details.
+
+* Recompile the kernel if any device property changes.
+* All information about the hardware configuration is hardcoded in the kernel source files 
+and board files.
+Cons: When there is a new device or any changes to existing device property recompiling the whole 
+kernel is required. To overcome this shortcoming DTB (Device Tree method) was introduced.
+
+Device Tree Method:
+* The DT was originally created by Open Firmware as part of the communication method for passing 
+data from Open Firmware to a client program (like to an Operating system).
+* An OS used the Device Tree to discover the topology of the hardware at runtime and thereby support
+majority of the hardwares without hard-coded information. (assuming drivers were avaialable for
+all the devices.)
+* This will get compiled to DTB which can be fed to OS which then parse and extract the encoded
+hardware information.
+
+Platform devices:
+Devices connected to the platform buses.
+
+Platform drivers:
+The drivers responsible for handling the platform devices.
+
+When we say we are writing device driver, we are referrring to the devices not the controller driver.
+Controller is typically the one which controls the transactions between the devices over a bus.
+The controller driver will be provided by the soc vendor, we are only required to write a driver for 
+the new devices that is going to get controlled by vendor given controller over the platform bus.
