@@ -1,0 +1,106 @@
+Registering a Platform Device:
+C Macro to use: found in /include/linux/platform_device.h
+
+#define platform_driver_register(drv)\
+    __platform_driver_register(drv, THIS_MODULE)    
+extern int __platform_driver_register(struct platform_driver *, struct module* );
+
+Platform Driver Structure:
+struct platform_driver{
+    int (*probe)(struct platform_device*);
+    int (*remove)(struct platform_device*);
+    void (*shutdown)(struct platform_device*, pm_message_t state);
+    struct device_driver driver; --> important
+    const struct platform_device_id *id_table;-->important
+};
+
+Another way to register a platform device:
+int platform_device_register(struct platform_device *pdev); -> Deprecated, This Api could be called 
+from board file or the device setup file.
+
+struct platform_device{
+    const char* name;
+    int id;
+    bool id_auto;
+    struct device dev;
+    struct resource *resource;
+};
+
+Platform Device-Driver Matching:
+Platform bus:
+(Linux Platform core)           <-------->          Add a new platform driver
+    /   \                       <-------->          Add a new platform device
+pdev1   pdrv1
+pdev2   pdrv2
+pdev3   pdrv3
+
+The Linux Platform Core implementation maintains 'platform device and driver' lists.
+When adding of new platform device or driver happens, this list gets updated and matching mechanism
+triggers.
+Every bus type has its match function, where the device and driver list will be scanned.
+If a platform device -> device list gets updated.
+If a platform driver -> driver list gets updated.
+
+Types of matching:
+1. Device tree compatible matching
+2. Name based matching
+3. id_table matching
+
+Name based matching:
+
+Platform bus:
+(Linux Platform core)           
+    /               \                       
+pdev1               pdrv1   .name ='xyz'
+.name ='abc'        pdrv2   .name ='def'
+*                   pdrv3   .name ='abc'
+
+Here the new device pdev1 gets added to the device list. Now the matching mechanism triggers, The
+name of the current device is compared with each of the driver list. There is a match here, as a 
+match is detected 'probe' method of this driver will get called with 'pdev1' as argument.
+
+Summary:
+* Whenver a new device or a new driver is added, the matching function of the platform bus runs, 
+and if it finds a matching platform device for a platform driver, the probe function of the matched 
+driver will get called.Inside the probe function, the driver configures the detected device.
+* Details of the matched platform device will be passed to the probe function of the matched driver 
+so that driver can extract the platform data and configures it.
+
+Probe function Functionality:
+* Should be implemented by platform driver and registered using platform_driver_register
+* When bus matching function detects the matching driver and device, the probe function of platform
+driver is called with platform device as an input argument.
+* Probe generally verify the specific device hardware actually exists. Sometimes platform setup code 
+can't be sure. Probing can use device resources, device platform data including clocks.
+* The probing function is responsible for:
+1.Device detection and initialization.
+2.Allocation of memories for various data structures.
+3.Mapping i/o memory
+4.Registering interrupt handlers.
+5.Registering device to kernel framework, user level access point creations etc.
+* May return 0 on success, or error code. If probe function returns non-zero value, meaning probing 
+of a device has failed.
+
+Remove Function:
+* Remove function gets called when a platform device is removed from the kernel to unbind the device
+from the driver or when the kernel no longer uses the platform device.
+* Responsible for:
+1. Unregistering the device from kernel framework
+2. Free memory if allocated on behalf of a device.
+3. Shutdown /Deinitialize the device.
+
+Similarly there are other functions:
+1. shutdown -> called at shutdown time to quiesce the device.
+2. suspend -> called to put the device to sleep usually to low power state.
+3. resume -> called to bring device from sleep mode.
+
+Code exercise:
+1. Implement the mychar mulitple driver as a platform driver.
+2. Driver should support multiple mychar devices (mychardev) as platform devices.
+3. Create device files to represent platform devices.
+4. Driver must open, read, release, write, lseek methods to deal with the devices.
+2 kernel module required:
+1. platform device setup:
+* Create 2 platform devices, and initialize them with required information like name, platform data,
+id of the device, release function of the device.
+2. Register platform device with the Linux Kernel.
