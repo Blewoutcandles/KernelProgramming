@@ -1,7 +1,7 @@
 #include <stdlib.h>
-#include <linux/kernel.h>
+#include <stdio.h>
 
-#define container_of(ptr, type, member) ({ ( (void*)ptr - (void*)&((type*)0)->member  })
+#define container_of(ptr, type, member) ({ (type*) ((void*)ptr - (void*)&((type*)0)->member); })
 struct some_data
 {
 	char a;
@@ -16,8 +16,10 @@ void get_container(char *ptr)
 {
 	/*by using 'ptr', use the address of 'data' container*/
 	struct some_data *pdata = container_of(ptr, struct some_data, c);
+	printf("a = %d, b = %d, c = %c, d = %d\n", pdata->a, pdata->b, pdata->c, pdata->d);
+	return;
 }
-int init()
+int main()
 {
 	data.a = 10;
 	data.b = 5;
@@ -25,4 +27,5 @@ int init()
 	data.d = 100;
 	//passing member's address
 	get_container(&data.c);
-	r
+	return 0;
+}
