@@ -104,3 +104,8 @@ Code exercise:
 * Create 2 platform devices, and initialize them with required information like name, platform data,
 id of the device, release function of the device.
 2. Register platform device with the Linux Kernel.
+
+Releasing a Platform Device:
+*Callback function to free the device after all the references ends.
+*This should be set by the allocator of the device.
+This is definitely needed if the resources are allocated dynamically.

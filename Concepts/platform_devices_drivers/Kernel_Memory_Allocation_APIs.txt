@@ -1,0 +1,34 @@
+kmalloc:
+void* kmalloc(size_t size, gfp_t flags);
+include/linux/slab.h
+* Used to allocate memory in kernel space by drivers and kernel functions.
+* Memory obtained are physically RAM contiguous.
+* kmalloc has limit in allocating memory since it will be in RAM, it is a good practice to 
+allocate memory less than page size (4kb).
+* flags -> changes the behaviour of the underlying memory allocator.
+return NULL if allocation fails, on success virutal address of the first page allocated.
+
+Important gfp flags:
+* GFP_KERNEL - Allocate normal kernel RAM, may sleep
+Used for normal dynamic kernel allocation on behalf of process context
+* GPP_ATOMIC_ALLOCATION - Allocation will not sleep, mayuse emergency pools.
+Used to request memory from the interrupt handler if not memory available right now will be returned 
+immediately without waiting.
+
+void kfree(const void* objp);
+Do not free memory allocated from other dynamically memory allocation technique apart from kmalloc
+
+Other kmalloc based functions:
+kmalloc_array();
+kcalloc();
+kzalloc();
+krealloc();
+
+Most important one is kzalloc:
+void *kzalloc(size_t size, gfp_t flags);
+Memory is set to zero after allocating memory.
+void kzfree(const void* p);
+can also use kfree here.
+
+void *krealloc(const void* p, size_t new_size, gfp_t flags);
+Generally for resizing the memory already  dynamically allocated.
