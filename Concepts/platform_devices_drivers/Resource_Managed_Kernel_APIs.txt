@@ -1,0 +1,28 @@
+kmalloc -> allocates memory in kernel.
+
+devm_kmalloc() -> This also allocates but remembers what has been allocated. (This is resource managed API).
+
+Explanation:
+struct device (platform device) -> this is part of the struct platform_device
+|                               \ Memory is allocated on behalf of this device
+|                                \
+V                                 ->    devm_kmalloc() - programmers using kfree is not required. Kernel
+kmalloc()                               will take care of the freeing memory when the device or managing 
+Programmer must use kfree               "driver" gets removed from the system.
+to free the memory.
+
+Summary: If a device is getting detached then struct device from struct platform_device needs to be freed, when
+using kmalloc we ll allocate as a whole we dont know how to deallocate the only a certain region of struct 
+platform_device another reason is if we dont kfree when the device is getting detached then it may lead to 
+memory leak so to resolve this devm_kmalloc was introduced-it is like leaving work of cleaning up to the kernel.
+There are similar functions like:
+gpiod_get(), gpio_put() -> devm_gpiod_get()
+request_irq(), free_irq() ->   devm_request_irq() (2 functions can be replaced by one)
+Refer kernel documentation on driver-model/devres
+
+NOTE: when using devm_kmalloc, kfree() function is no longer required as the kernel takes care of freeing memory.
+There is difference in the number of parameters:
+for kmalloc - 2 parameters, for devm_kmalloc(3parameters)
+datatype *kmalloc(sizeof(variable), flag-GFP_KERNEL);
+datatype *devm_kalloc(&platform_device_struct->struct device, sizeof(variable), flag-GFP_KERNEL);
+allocating the entire memory on behalf of this device.
