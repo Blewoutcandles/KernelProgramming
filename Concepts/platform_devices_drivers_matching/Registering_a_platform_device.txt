@@ -66,6 +66,14 @@ driver will get called.Inside the probe function, the driver configures the dete
 * Details of the matched platform device will be passed to the probe function of the matched driver 
 so that driver can extract the platform data and configures it.
 
+NOTE: While registering the devices, two methods can be followed:
+i.using platform_register_device
+ii.using platform_add_devices()
+
+using platform_add_devices(struct platform_devices **dev, int num)
+struct platform_devices **dev -> array of Platform devices pointers
+[remember single star -> referring to platform_devices, double star refers to array of pointers]
+num -> size of the array
 Probe function Functionality:
 * Should be implemented by platform driver and registered using platform_driver_register
 * When bus matching function detects the matching driver and device, the probe function of platform
@@ -109,3 +117,4 @@ Releasing a Platform Device:
 *Callback function to free the device after all the references ends.
 *This should be set by the allocator of the device.
 This is definitely needed if the resources are allocated dynamically.
+
