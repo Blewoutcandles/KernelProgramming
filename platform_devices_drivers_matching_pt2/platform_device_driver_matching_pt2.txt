@@ -1,0 +1,34 @@
+This module going to modify the mychar driver to support different versions of mychardevs.
+For eg, If a company releases different version of sensor over a time say A1x, b1x and c1x.
+There should not be a separate driver to support these versions of sensor which are with different 
+config items.
+Lets name these mychar devices as : mychardev-A1x, mychardev-B1x, and mychardev-C1x each of them with
+config items of mychardev-A1x, mychardev-B1x, mychardev-C1x respectively.
+
+struct platform_driver{
+    ....
+    const struct platform_device_id *id_table;
+};
+
+struct platform_device_id{
+    char name[PLATFORM_NAME_SIZE];
+    kernel_ulong_t driver_data; ->store the id of the config item here
+}; present in /linux/mod_devicetable.h
+This structure is also present in struct platform_device as a member.
+
+In part 1, we made use of name matching, while here we are using id_table matching (i.e., different 
+versions of the device). This matching mechanism can be verified from a file drivers/base/platform.c 
+-> platform_match which binds the platform device with driver.
+This attempts to match:
+i.using device tree matching.
+ii.using ACPI style matching.
+iii.using id table matching.
+iv.using driver name matching.
+
+Important Note:
+* While writing platform driver we have module init, exit and their corresponding functions.
+These all can be replaced by a single macro:
+module_platform_driver(__platform_driver); -> this macro comprises module registration, init and exit
+functions and is defined in /include/linux/platform_device.h
+The init and exit functions of this macro just does platform_register and platform_unregister.
+We didn't use this macro in driver since we had alloc_chardev, unregister like those functions.
