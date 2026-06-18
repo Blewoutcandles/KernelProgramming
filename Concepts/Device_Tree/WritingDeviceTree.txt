@@ -1,0 +1,59 @@
+Writing Device Tree:
+* The Device Tree supports a hierarchical way of writing hardware description at the soc level, specific and common
+board level. Most of the time, writing a device tree is not difficult and we can reuse most of the common hardware
+information from the device tree file of the reference board.
+*For eg, if a new board is made which is slightly different from the reference board, then we can use the device
+tree file of the reference board with only the new hardware detail of the new board.
+
+Hardware Hierarchy:
+* It comes at various levels because the device has many device blocks 
+i. soc
+ii.soc has on chip processor and on chip peripherals
+iii.The board also has various peripherals onboard like sensors, leds, buttons, joysticks, external memories, touch
+screen etc..,
+like for example: AM335x has two device tree files, one is to explain the soc details and other is for board
+specific device tree files - sensor, led, power sockets like that. Given that device tree file2 includes
+device tree file 1 like '#include "am33xx.dtsi"'
+These files can be found in linux/arch/arm/boot/dts
+
+root directory
+/{
+    root-body
+    root level Node-1{
+        a-string-property="A string";
+        A-32-bit integer property = <800>;
+        string-list-property="1-string","2ndstring";
+        Child-Node-1{
+            byte-array-property=<0x30 0x20 0xFE 0x10>;
+        };
+    };
+    root level Node-2{
+        A-Boolean-property;
+        Child-Node-1{
+
+        };
+        Child-Node-2{
+
+        };
+    };
+}
+
+NOTE:   The device tree has a single root node of which all the other device nodes are descendents. The full path 
+to the root node is /. All device trees shall have root node, and the following nodes shall be present at the root
+of all device nodes.
+* One /CPUs node.
+* At least one /memory node.
+
+How to write a device tree:
+* Remember that you most probably be writing device tree addons or overlays for your board-related changes but not
+for entire soc.
+* The soc specific device tree will be given by the vendor in the form of device tree inclusion file (.dtsi) and
+you just need to include that in your board-level device tree.
+* Follow modulatory approach while writing device tree.
+
+Device Tree writing syntax:
+* Node name.
+* Node label.
+* Standard and non-standard property names.
+* Different data type representation (u32, byte, byte stream, string, stream of strings, Boolean etc)
+* SOC node and children.

@@ -1,0 +1,6 @@
+Overview of device Tree structure:
+* A device tree is a collection of device nodes.
+* A device node or simply called a node represents a device. Nodes are organised in some systematic way inside 
+the device tree file. 
+* They also have parent and child relationship and every device tree must have one root node.
+* A node explains itself, that is, reveal its data adn resources using its properties.

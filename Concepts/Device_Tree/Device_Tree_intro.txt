@@ -1,0 +1,25 @@
+Device Tree(DT):
+* Open Firmware Device Tree or DT is a data exachange format used for exchanging hardware description
+with the os or software.
+* Basically it is the hardware description that is readable by OS so it does not need to hardcode the 
+details of the machine.
+* It is new and recommended way to describe non-platform devices to the linux kernel, which was 
+previously hardcoded into the kernel files.
+lookup : kernel/usage-model.txt
+* An OS uses the device tree to identify the topology of the hardware at runtime, and thereby 
+support a majority of available hardware without hardcoded information. (with drivers present for devices)
+* DT is a data structure that describes the hardware.
+* DT provides a language for decoupling the hardware configuration from the device driver and board support
+files of the linux kernel.
+* Using it allows device drivers to become data-driven. To make setup decisions based on data passed into the kernel
+instead of on per-machine hardcoded selections.
+* Ideally the data-driven platform setup should result in less code duplication and make it easier to support 
+a wide range of hardware with a single kernel image.
+
+Why DT is used?
+* Linux uses DT for ,
+i.platform identification
+ii.Device population
+-Kernel parses the device tree data and generates the required software data structure, which will be used by 
+the kernel code.
+NOTE: The device tree can be fed into any os to get the hardware details of the device.
