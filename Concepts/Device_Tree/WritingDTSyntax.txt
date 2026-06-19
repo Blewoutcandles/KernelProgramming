@@ -1,0 +1,41 @@
+Device Tree writing syntax:
+* Node name.
+* Node label.
+* Standard and non-standard property names.
+* Different data type representation (u32, byte, byte stream, string, stream of strings, Boolean etc)
+* SOC node and children.
+NOTE: Never edit the root files if you would like to edit make a new device inherit the root files, and override It
+in your new Device Tree file (.dtsi) file. 
+
+Refer Device Tree specification from devicetree.org chapter 2 - node names.
+node-name@unit-address
+The unit address must match the first address specified in the reg property of the node. If no reg property then 
+unit-address can be omitted and node name alone differentiates from other nodes at the same level in tree.
+Reg property used to describe some address properties of the device nodes.
+The root node does not contain node-name or unit-address.
+/{
+    label  unitaddress -> heading not included inthis format just for understanding
+    i2c0: i2c@44e0b000{
+        compatible = "ti, omap4-i2c";
+        #address-cells = <1>;
+        #size-cells = <0>;
+        ti,hwmods = "i2c1";
+        reg = <0x44e0b000 0x1000>;
+        interrupts = <70>;
+        status = "disabled";
+    };
+    i2c1: i2c@4802a000{
+        s;
+    }
+};
+keypoints:
+Node name is in the format node@unit-address
+This combination differentiates the node from other nodes at the same level in the tree.
+To write "node-name" alphabet (stick to lower case), and number combinations are allowed. So choose an appropriate
+name, it would be good if it represents the general class of a device like serial, i2c, led etc.
+The unit-address must match the first address specified in the reg property of the node. If the node has no reg 
+property, the @unit-address must be omitted.
+
+If the root dtsi file is included in your new dtsi file and then you want to override some variables or board
+details kind of thing then you could refer to the variable using '&' symbol in addition to that we can also add 
+some child nodes to it.

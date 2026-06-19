@@ -50,10 +50,4 @@ for entire soc.
 * The soc specific device tree will be given by the vendor in the form of device tree inclusion file (.dtsi) and
 you just need to include that in your board-level device tree.
 * Follow modulatory approach while writing device tree.
-
-Device Tree writing syntax:
-* Node name.
-* Node label.
-* Standard and non-standard property names.
-* Different data type representation (u32, byte, byte stream, string, stream of strings, Boolean etc)
-* SOC node and children.
+ 
