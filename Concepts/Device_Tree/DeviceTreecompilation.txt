@@ -1,0 +1,4 @@
+1. make clean
+2. make ARCH=arm64 bcm2711_defconfig
+3. make ARCH=arm64 CROSS_COMPILE=aarch64-linux-gnu- dtbs
+4. make ARCH=arm64 CROSS_COMPILE=aarch64-linux-gnu- broadcom/bcm2711-rpi-4-b.dtb
