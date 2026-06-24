@@ -28,3 +28,14 @@ for eg,
 				org,device-serial-num = "MYCHARDEV1ABC000";
 	};
 };
+
+Where this content should be :
+1. create a file like with some name.dtsi under Rspi_linux/arch/arm64/dts/broadcom/
+2. save it.
+3, Include it in some .dts file here likey it would be "bcm2711-rpi-4-b.dts using #include "filename.dtsi"
+Since now we have manually fed our device details to the modules, compile it and install it to the running kernel.
+This device tree has a list of supported devices where we can simply feed the dtb file to kernel at boot thus 
+eliminating the need to recompile the kernel everytime there is some sort of hardware board changes to the existing
+or newer board details. Ultimately now we can boot kernel in different boards with their device tree blob fed 
+during bootup to recognise the board with updated details.
+see DeviceTreeCompilation.txt for next compilation steps.
