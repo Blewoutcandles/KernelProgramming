@@ -1,0 +1,30 @@
+mychardev- properties:
+org,size = <512> ;//non-standard represents integer data
+org,device-serial-num = "PCDEV1ABC123";//this is a non-standard property representing string data
+org,perm = <0x11>; // this is a non-standard property and represents integer data.
+for eg,
+/{
+	mychardev-1	{
+				org,size = <512>;
+				org,perm = <0x11>;
+				org,device-serial-num = "MYCHARDEV1ABC123";
+	};
+
+	mychardev-2	{
+				org,size = <1024>;
+				org,perm = <0x11>;
+				org,device-serial-num = "MYCHARDEV2ABC456";
+	};
+	
+	mychardev-3	{
+				org,size = <256>;
+				org,perm = <0x11>;
+				org,device-serial-num = "MYCHARDEV1ABC789";
+	};
+	
+	mychardev-4	{
+				org,size = <2048>;
+				org,perm = <0x11>;
+				org,device-serial-num = "MYCHARDEV1ABC000";
+	};
+};
