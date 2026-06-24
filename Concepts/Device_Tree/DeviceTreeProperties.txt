@@ -1,0 +1,63 @@
+Drivermychardrv -> mychardev-1, mychardev-2, mychardev-3, mychardev-4
+Properties:
+i. size
+ii.device serial number
+iii.permission
+
+Instantiating the device drivers from device tree, previously we registered using kernel API's to dynamically recognise 
+the device when the driver is present in the OS.
+
+What is a property?
+A property is a key-value pair.
+for eg,
+label = "beaglebone:green:usr0";   -> This a single property.
+property    Value
+name
+
+Different types of properties:
+*Standard property
+    -Explained by the specification and binder binding documentation.
+* Custom property
+    -Specific to particular vendor  or organization which is not documented by the specification.
+    -Custom property begins with your organization names.
+You can refer device tree specification documentation to view more of this information. 2.2.4
+for eg, custom property name: 
+company_name,your-property-here
+
+Important property explanation:
+Property: compatible
+compatible = <string-list>
+propertyname        value-types
+eg:
+compatible = "string1", "string2", "string3";
+* Compatible property of a device node is used by the linux kernel to match and load an appropriate driver to handle that
+device node.
+* The string list provided by the compatible property is matched against the string list supported by the driver. If the
+kernel finds any match, the driver will be loaded and probe function is invoked. Generally the device node exposes its
+compatible property and the kernel checks the string-list type value of the driver with the device node compatible property
+string list type now, it it matches then the kernel loads the driver and invoke the probe function.
+eg,
+compatible = "fsl,mpc8641", "nsl6550";
+manufacturer name at first then comma followed by model no.
+In this example the kernel will first try to locate the device driver that supports fsl,mpc8641. If the driver is not found 
+,then it would try to locate a driver that supports more general nsl6550 device type.
+Compatibe always start with most compatible then goes to least compatible.
+for eg,
+/{
+    model = "TI AM335 BeagleBone Black";
+    compatible = "ti,am335-bone-black", "ti,am335x-bone", "ti,am33xx";
+};
+first compatible property string list first value here:"ti,am335-bone-black" -> It claims the exact compatible 
+name of the board that the kernel supports it. 
+The second value : "ti,am335x-bone" -> It is also compatible with kernel which supports bone devices based on 
+am335x, if the kernel doesn't support previous exact model that is the first string type here.
+The third value type: If the kernel does not support any of the previous boards, the third one with generic will get 
+supported.
+Uses:
+i. Machine identification and initialization.
+ii. Match and load the appropriate driver for the device node.
+
+The device node for example i2c has its own compatible property these are avaialble in dtsi file of the os. Now when the 
+device is getting initialized then it will look for the specific driver source file from the filesystem. The default
+property of the device node will get overrided by some dtsi common files indicating that the device is supportable,
+once they find that the device is supported by the dtsi files, then the driver probe function will get invoked.

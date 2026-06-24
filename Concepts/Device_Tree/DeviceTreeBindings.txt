@@ -1,0 +1,37 @@
+Knowing the property name and the value pair to use to describe a device node:
+* Refer device tree binding document.
+* The properties that are necessary to describe a device in the device tree depends on the requirements of the linux
+driver for that device.
+* When such required properties are provided, the driver of charge can detect the device from the device tree and 
+configure it. 
+NOTE: you can also documentation in the linuxsource folder/Documentation/DeviceTree/bindings see "required properties". 
+Also Compatible string and properties are first defined by the client program (os, drivers) then shared with DT writer.
+
+Driver Implementation                  --------------->                     DT Implementation
+Driver decides compatible                                           DT refers to the binding document and initializes
+strings and documents in device                                     relevant values for the compatible properties.
+tree binding document.
+
+Some examples of device and driver binding:
+Example of lm75
+mpu 6050
+
+Device Tree Bindings key points to note:
+case1 : If the driver is already avaialable for your device then you just have to add the device to device tree through
+binding documentation on how to create a device tree node x.
+case2: If the driver is not present then you must write your own driver, should decide which properties to use (combinations
+of standard and non-standard property) you should then provide device tree binding document describing what are all the
+properties and compatible strings a device tree write must include.
+
+Linux Conventions to Write Device tree:
+* Dont use 0X, instead use 0x.
+* nodenames: should begin with a to z or A to Z. 
+    - unit address does not begin 0x, the number is assumed to be hexadecimal.
+    - unit address does not have leading zeros.
+    - use dash - instead of underscore
+* label names: should begin with a to z or A to Z. 
+    - should be lowercase
+    - use underscore _ instead of -
+* property names:  should be lowercase
+    - should begin with a to z
+    - use dash - instead of underscore
