@@ -1,0 +1,154 @@
+For a Raspberry Pi 4 Model B, you should NOT choose broadcom/ randomly because Raspberry Pi has its own subdirectory.
+
+1. Find the Raspberry Pi DTS
+
+Go to:
+arch/arm64/boot/dts/broadcom/
+
+You will see files like:
+
+bcm2711-rpi-4-b.dts
+bcm2711-rpi-400.dts
+bcm2711-rpi-cm4.dts
+
+For Raspberry Pi 4 Model B:
+
+bcm2711-rpi-4-b.dts
+
+This is the file you need to inspect.
+
+2. Don't edit the main DTS directly
+
+Suppose your Udemy instructor adds:
+
+my_device {
+    compatible = "mycompany,mydevice";
+};
+
+Instead of editing:
+
+bcm2711-rpi-4-b.dts
+
+it is much better to create an overlay:
+
+arch/arm64/boot/dts/overlays/mydevice-overlay.dts
+
+Why?
+
+Kernel updates won't overwrite your changes.
+Easy to enable/disable.
+Raspberry Pi officially recommends overlays.
+
+Think of the main DTS as the motherboard blueprint 🗺️ and overlays as transparent sheets you place on top.
+
+3. If you are learning platform drivers
+
+Suppose your driver is:
+
+static const struct of_device_id my_driver_of_match[] = {
+    { .compatible = "mycompany,mydevice" },
+    {}
+};
+
+Your overlay can be:
+
+/dts-v1/;
+/plugin/;
+
+/ {
+    compatible = "brcm,bcm2711";
+
+    fragment@0 {
+        target-path = "/";
+
+        __overlay__ {
+
+            mydevice {
+                compatible = "mycompany,mydevice";
+                status = "okay";
+            };
+        };
+    };
+};
+
+When the kernel boots:
+
+DT -> compatible string
+       ↓
+OF matching
+       ↓
+platform_driver probe()
+
+and your driver's probe() gets called automatically.
+
+4. Compile the overlay
+
+From kernel source:
+
+make ARCH=arm64 dtbs
+make ARCH=arm64 dtbs_install
+
+Or compile only the overlay:
+
+dtc -@ -I dts -O dtb \
+    -o mydevice.dtbo \
+    mydevice-overlay.dts
+5. Copy to Raspberry Pi
+
+Copy:
+
+mydevice.dtbo
+
+to
+
+/boot/overlays/
+
+Then edit:
+
+sudo nano /boot/firmware/config.txt
+
+or on older systems:
+
+sudo nano /boot/config.txt
+
+Add:
+
+dtoverlay=mydevice
+6. Reboot and verify
+sudo reboot
+
+After boot:
+
+dmesg | grep mydevice
+
+or
+
+ls /proc/device-tree/
+
+You can also inspect:
+
+cat /proc/device-tree/model
+
+which should show:
+
+Raspberry Pi 4 Model B Rev ...
+7. Updating the kernel image on Raspberry Pi 4
+
+If you modify the kernel source itself, you would typically build:
+
+make ARCH=arm64 bcm2711_defconfig
+make -j$(nproc)
+
+This generates:
+
+arch/arm64/boot/Image
+
+Copy it to:
+
+/boot/firmware/kernel8.img
+
+and reboot.
+
+However, for learning Device Tree and platform drivers, 
+you usually do not need to rebuild the entire kernel image. Building and 
+loading a .dtbo overlay is much faster and safer.
