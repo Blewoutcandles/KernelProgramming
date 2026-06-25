@@ -152,3 +152,30 @@ and reboot.
 However, for learning Device Tree and platform drivers, 
 you usually do not need to rebuild the entire kernel image. Building and 
 loading a .dtbo overlay is much faster and safer.
+
+Updating the built dtb to the raspberrypi:
+
+scp arch/arm64/boot/dts/broadcom/bcm2711-rpi-4-b.dtb pi:/boot/firmware/
+reboot
+
+To check whether the dtb update is successful via device check:
+1.cd /sys/
+2.cd devices
+3.cd platform/
+4.ls -l  
+    to view the devices under the platform folder.
+5 Going inside any of the device you can find things like :
+driver_override modalias of_node power subsystem uevent
+
+Get inside of_node using cd of_node;
+compatible name org,device-serial-num org,perm org,size
+
+You can view the compatible using cat compatible
+give the string you have given in driver file under compatible tag.
+
+Go to drivers folder in raspberry pi to load the driver to check whether our devices loaded via device tree 
+is getting detected.
+sudo insmod our_driver_dt.ko
+you can view the device is detected in the terminal messages.
+sudo rmmod our_driver_dt.ko
+you can view the device is removed in the terminal messages.
