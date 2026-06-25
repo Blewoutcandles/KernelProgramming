@@ -2,3 +2,11 @@
 2. make ARCH=arm64 bcm2711_defconfig
 3. make ARCH=arm64 CROSS_COMPILE=aarch64-linux-gnu- dtbs
 4. make ARCH=arm64 CROSS_COMPILE=aarch64-linux-gnu- broadcom/bcm2711-rpi-4-b.dtb
+
+Special NOTE: Add this to the make file.
+copy-dtb:
+    scp path_to_dtb_file raspberrypilocal@ip_address:/home/path_to_destination_dtb folder
+copy-drv:
+    scp path_to_.ko_file raspberrypilocal@ip_address:/home/path_to_destination_.ko folder
+
+Once that is done refer to raspberry pi uimage update text file.
